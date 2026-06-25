@@ -4,13 +4,14 @@
 <meta charset="UTF-8">
 <title>Cicranos Rock - Repertório</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 body{font-family:Arial,sans-serif;background:#111;color:#fff;margin:0;padding:20px}
-h1{text-align:center;color:#e00000}
+h1{text-align:center;color:#e00000;margin-bottom:5px}
+.subtitulo{text-align:center;color:#ccc;margin-bottom:20px;font-size:14px}
 nav{text-align:center;margin-bottom:20px}
-button{background:#e00000;color:#fff;border:none;padding:10px;margin:5px;border-radius:6px;cursor:pointer}
-button:hover{opacity:.9}
+button{background:#e00000;color:#fff;border:none;padding:10px;margin:5px;border-radius:6px;cursor:pointer;font-weight:bold}
+button:hover{background:#b80000}
 section{display:none;background:#1c1c1c;padding:15px;border-radius:10px;margin-bottom:20px}
 section.ativo{display:block}
 input{width:100%;padding:10px;margin:8px 0;border-radius:6px;border:none;box-sizing:border-box}
@@ -18,368 +19,188 @@ ul{list-style:none;padding:0}
 li{background:#2a2a2a;margin:6px 0;padding:10px;border-radius:6px}
 .teclado{border-left:5px solid red}
 .musica-item{display:flex;gap:10px;align-items:center;background:#2a2a2a;margin:6px 0;padding:10px;border-radius:6px}
-.musica-item input{width:auto;margin:0;flex:0 0 auto}
-.musica-texto{line-height:1.35}
-.numero-lilas{color:#b66cff;font-weight:bold}
-.tipo-musica{color:#bbb;font-size:.9em}
-#resultado{white-space:pre-line;background:#000;padding:15px;border-radius:8px;min-height:80px}
-#resultado .numero-lilas{color:#b66cff;font-weight:bold}
+.musica-item input{width:auto}
+.leo{color:#c05cff;font-weight:bold;min-width:35px;display:inline-block;text-align:right}
+.tipo{color:#aaa;font-size:12px;margin-left:auto}
+#resultado{white-space:pre-line;background:#000;padding:15px;border-radius:8px;font-family:Consolas,monospace;line-height:1.5}
+.aviso{font-size:13px;color:#ccc;margin-top:8px}
 </style>
 </head>
-
 <body>
-
 <h1>Cicranos Rock - Repertório</h1>
-
+<div class="subtitulo">Ordem por clique | Nº Leo | Música</div>
 <nav>
 <button onclick="abrir('montar')">Montar Repertório</button>
 <button onclick="abrir('teclado')">Com Teclado</button>
 <button onclick="abrir('semteclado')">Sem Teclado</button>
 <button onclick="abrir('nacionais')">Nacionais</button>
 </nav>
-
 <section id="montar" class="ativo">
 <h2>Montar Repertório</h2>
-
 <input id="local" placeholder="Nome do lugar / evento">
 <input id="data" type="date">
-
 <h3>Escolha as músicas</h3>
+<div class="aviso">A lista final será montada exatamente na ordem em que as músicas forem selecionadas.</div>
 <div id="listaMusicas"></div>
-
 <button onclick="gerarRepertorio()">Gerar Repertório</button>
 <button onclick="salvarPDF()">Salvar em PDF</button>
 <button onclick="limparSelecao()">Limpar Seleção</button>
-
 <h3>Repertório Final</h3>
 <div id="resultado"></div>
 </section>
-
-<section id="teclado">
-<h2>Com Teclado</h2>
-<ul id="listaTeclado"></ul>
-</section>
-
-<section id="semteclado">
-<h2>Sem Teclado</h2>
-<ul id="listaSemTeclado"></ul>
-</section>
-
-<section id="nacionais">
-<h2>Nacionais</h2>
-<ul id="listaNacionais"></ul>
-</section>
-
+<section id="teclado"><h2>Com Teclado</h2><ul id="listaTeclado"></ul></section>
+<section id="semteclado"><h2>Sem Teclado</h2><ul id="listaSemTeclado"></ul></section>
+<section id="nacionais"><h2>Nacionais</h2><ul id="listaNacionais"></ul></section>
 <script>
 const comTeclado = [
-"You Give Love a Bad Name",
-"Crazy Little Thing Called Love",
-"Easy",
-"Killing Moon",
-"Money For Nothing",
-"The Wall",
-"In Between Days",
-"Don't You Forget About Me",
-"Enjoy The Silence",
-"Walk Of Life",
-"Boys Don't Cry",
-"The Final Countdown",
-"Jump"
+{leo:"66", nome:"You Give Love a Bad Name"},
+{leo:"22", nome:"Crazy Little Thing Called Love"},
+{leo:"84", nome:"Easy"},
+{leo:"70", nome:"Killing Moon"},
+{leo:"47", nome:"Money For Nothing"},
+{leo:"--", nome:"The Wall"},
+{leo:"38", nome:"In Between Days"},
+{leo:"75", nome:"Don't You Forget About Me"},
+{leo:"27", nome:"Enjoy The Silence"},
+{leo:"14", nome:"Walk Of Life"},
+{leo:"85", nome:"Boys Don't Cry"},
+{leo:"61", nome:"The Final Countdown"},
+{leo:"43", nome:"Jump"}
 ];
-
 const semTeclado = [
-{nome:"Sultans of Swing", numero:"82"},
-{nome:"One Last Breath", numero:"23"},
-{nome:"Like a Stone", numero:"45"},
-{nome:"I Am Mine", numero:"35"},
-{nome:"Suedehead", numero:"81"},
-{nome:"The One I Love", numero:"83"},
-{nome:"Creep", numero:"24"},
-{nome:"My Hero"},
-{nome:"Mama I'm Coming Home"},
-{nome:"My Sacrifice"},
-{nome:"Lonely Day"},
-{nome:"Plush"},
-{nome:"Scar Tissue"},
-{nome:"Don't Look Back In Anger"},
-{nome:"Born To Be Wild"},
-{nome:"Poison Heart"},
-{nome:"Learn To Fly"},
-{nome:"Pet Sematary"},
-{nome:"Freak"},
-{nome:"Even Flow"},
-{nome:"Breaking The Law"},
-{nome:"Rock And Roll All Nite"},
-{nome:"Seek & Destroy"},
-{nome:"Enter Sandman"},
-{nome:"Aerials"},
-{nome:"Toxicity"}
+{leo:"82", nome:"Sultans of Swing"},
+{leo:"23", nome:"One Last Breath"},
+{leo:"45", nome:"Like a Stone"},
+{leo:"35", nome:"I Am Mine"},
+{leo:"81", nome:"Suedehead"},
+{leo:"83", nome:"The One I Love"},
+{leo:"24", nome:"Creep"},
+{leo:"89", nome:"My Hero"},
+{leo:"46", nome:"Mama I'm Coming Home"},
+{leo:"48", nome:"My Sacrifice"},
+{leo:"03", nome:"Lonely Day"},
+{leo:"86", nome:"Plush"},
+{leo:"79", nome:"Scar Tissue"},
+{leo:"00", nome:"Don't Look Back In Anger"},
+{leo:"52", nome:"Born To Be Wild"},
+{leo:"54", nome:"Poison Heart"},
+{leo:"16", nome:"Learn To Fly"},
+{leo:"53", nome:"Pet Sematary"},
+{leo:"102", nome:"Freak"},
+{leo:"00", nome:"Even Flow"},
+{leo:"74", nome:"Breaking The Law"},
+{leo:"76", nome:"Rock And Roll All Nite"},
+{leo:"99", nome:"Seek & Destroy"},
+{leo:"09", nome:"Enter Sandman"},
+{leo:"01", nome:"Aerials"},
+{leo:"02", nome:"Toxicity"}
 ];
-
 const nacionais = [
-"Camila, Camila",
-"Toda Forma de Poder",
-"Segredos",
-"À Sua Maneira",
-"O Tempo Não Para",
-"Anna Júlia",
-"Tempo Perdido",
-"A Mais Pedida",
-"O Poeta Está Vivo",
-"Por Que a Gente É Assim",
-"I Say You Saying",
-"Mulher de Fases",
-"Bete Balanço",
-"Há Tempos",
-"Eu Era um Lobisomem Juvenil",
-"Eu Sei",
-"Que País É Este",
-"Até Quando Esperar",
-"Homem Primata",
-"Será",
-"Fátima",
-"Zóio de Lula",
-"Só Por Uma Noite",
-"Te Levar",
-"Do Seu Lado",
-"Meu Erro",
-"Cowboy Fora da Lei",
-"Dias de Luta",
-"Envelheço na Cidade",
-"Caso Sério",
-"Ideologia",
-"Pense e Dance",
-"Lugar Nenhum",
-"Me Lambe"
+{leo:"--", nome:"Camila, Camila"},
+{leo:"--", nome:"Toda Forma de Poder"},
+{leo:"--", nome:"Segredos"},
+{leo:"--", nome:"À Sua Maneira"},
+{leo:"--", nome:"O Tempo Não Para"},
+{leo:"--", nome:"Anna Júlia"},
+{leo:"--", nome:"Tempo Perdido"},
+{leo:"--", nome:"A Mais Pedida"},
+{leo:"--", nome:"O Poeta Está Vivo"},
+{leo:"--", nome:"Por Que a Gente É Assim"},
+{leo:"--", nome:"I Say You Saying"},
+{leo:"--", nome:"Mulher de Fases"},
+{leo:"--", nome:"Bete Balanço"},
+{leo:"--", nome:"Há Tempos"},
+{leo:"--", nome:"Eu Era um Lobisomem Juvenil"},
+{leo:"--", nome:"Eu Sei"},
+{leo:"--", nome:"Que País É Este"},
+{leo:"--", nome:"Até Quando Esperar"},
+{leo:"--", nome:"Homem Primata"},
+{leo:"--", nome:"Será"},
+{leo:"--", nome:"Fátima"},
+{leo:"--", nome:"Zóio de Lula"},
+{leo:"--", nome:"Só Por Uma Noite"},
+{leo:"--", nome:"Te Levar"},
+{leo:"--", nome:"Do Seu Lado"},
+{leo:"--", nome:"Meu Erro"},
+{leo:"--", nome:"Cowboy Fora da Lei"},
+{leo:"--", nome:"Dias de Luta"},
+{leo:"--", nome:"Envelheço na Cidade"},
+{leo:"--", nome:"Caso Sério"},
+{leo:"--", nome:"Ideologia"},
+{leo:"--", nome:"Pense e Dance"},
+{leo:"--", nome:"Lugar Nenhum"},
+{leo:"--", nome:"Me Lambe"}
 ];
-
 const todas = [
-...comTeclado.map(m => ({nome:m, tipo:"Com teclado"})),
-...semTeclado.map(m => ({nome:m.nome, tipo:"Sem teclado", numero:m.numero || ""})),
-...nacionais.map(m => ({nome:m, tipo:"Nacional"}))
-].map((m, index) => ({...m, id:`musica_${index}`}));
-
-let ordemEscolha = [];
-let ultimoTextoPDF = "";
-
-function abrir(id){
-  document.querySelectorAll("section").forEach(sec => sec.classList.remove("ativo"));
-  document.getElementById(id).classList.add("ativo");
-}
-
-function criarTextoMusica(m){
-  const span = document.createElement("span");
-  span.className = "musica-texto";
-
-  if(m.numero){
-    const numero = document.createElement("span");
-    numero.className = "numero-lilas";
-    numero.textContent = m.numero;
-    span.appendChild(numero);
-    span.appendChild(document.createTextNode(" - "));
-  }
-
-  span.appendChild(document.createTextNode(`${m.nome} - `));
-
-  const tipo = document.createElement("span");
-  tipo.className = "tipo-musica";
-  tipo.textContent = m.tipo;
-  span.appendChild(tipo);
-
-  return span;
-}
-
+...comTeclado.map(m => ({...m, tipo:"Com teclado"})),
+...semTeclado.map(m => ({...m, tipo:"Sem teclado"})),
+...nacionais.map(m => ({...m, tipo:"Nacional"}))
+];
+let ordemEscolha = JSON.parse(localStorage.getItem("ordemEscolha") || "[]");
+function abrir(id){document.querySelectorAll("section").forEach(sec=>sec.classList.remove("ativo"));document.getElementById(id).classList.add("ativo");}
+function musicaId(m){return `${m.tipo}__${m.nome}`;}
+function formatarItemLista(m){return `<span class="leo">${m.leo}</span> - ${m.nome} <span class="tipo">${m.tipo}</span>`;}
 function carregarListas(){
-  const listaMusicas = document.getElementById("listaMusicas");
-  const listaTeclado = document.getElementById("listaTeclado");
-  const listaSemTeclado = document.getElementById("listaSemTeclado");
-  const listaNacionais = document.getElementById("listaNacionais");
-
-  todas.forEach((m) => {
-    const label = document.createElement("label");
-    label.className = "musica-item";
-
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.value = m.nome;
-    checkbox.dataset.id = m.id;
-    checkbox.dataset.tipo = m.tipo;
-    checkbox.dataset.numero = m.numero || "";
-
-    checkbox.addEventListener("change", function(){
-      if(this.checked){
-        if(!ordemEscolha.includes(m.id)) ordemEscolha.push(m.id);
-      }else{
-        ordemEscolha = ordemEscolha.filter(id => id !== m.id);
-      }
-      salvarEstadoSelecao();
-    });
-
-    label.appendChild(checkbox);
-    label.appendChild(criarTextoMusica(m));
-    listaMusicas.appendChild(label);
+ const listaMusicas=document.getElementById("listaMusicas");
+ todas.forEach(m=>{
+  const id=musicaId(m);
+  listaMusicas.innerHTML += `<label class="musica-item"><input type="checkbox" value="${id}" data-nome="${m.nome}" data-leo="${m.leo}" data-tipo="${m.tipo}">${formatarItemLista(m)}</label>`;
+ });
+ comTeclado.forEach(m=>document.getElementById("listaTeclado").innerHTML+=`<li class="teclado"><span class="leo">${m.leo}</span> - ${m.nome}</li>`);
+ semTeclado.forEach(m=>document.getElementById("listaSemTeclado").innerHTML+=`<li><span class="leo">${m.leo}</span> - ${m.nome}</li>`);
+ nacionais.forEach(m=>document.getElementById("listaNacionais").innerHTML+=`<li><span class="leo">${m.leo}</span> - ${m.nome}</li>`);
+}
+function registrarOrdemEscolha(){
+ document.querySelectorAll("#listaMusicas input[type='checkbox']").forEach(input=>{
+  if(ordemEscolha.includes(input.value)){input.checked=true;}
+  input.addEventListener("change",function(){
+   if(this.checked){if(!ordemEscolha.includes(this.value)){ordemEscolha.push(this.value);}}
+   else{ordemEscolha=ordemEscolha.filter(id=>id!==this.value);}
+   localStorage.setItem("ordemEscolha",JSON.stringify(ordemEscolha));
   });
-
-  comTeclado.forEach(m => {
-    const li = document.createElement("li");
-    li.className = "teclado";
-    li.textContent = m;
-    listaTeclado.appendChild(li);
-  });
-
-  semTeclado.forEach(m => {
-    const li = document.createElement("li");
-    if(m.numero){
-      const numero = document.createElement("span");
-      numero.className = "numero-lilas";
-      numero.textContent = m.numero;
-      li.appendChild(numero);
-      li.appendChild(document.createTextNode(" - "));
-    }
-    li.appendChild(document.createTextNode(m.nome));
-    listaSemTeclado.appendChild(li);
-  });
-
-  nacionais.forEach(m => {
-    const li = document.createElement("li");
-    li.textContent = m;
-    listaNacionais.appendChild(li);
-  });
+ });
 }
-
-function salvarEstadoSelecao(){
-  localStorage.setItem("ordemEscolha", JSON.stringify(ordemEscolha));
-}
-
-function montarLinha(m, index){
-  const teclado = m.tipo === "Com teclado" ? " [TECLADO]" : "";
-  const numero = m.numero || String(index + 1).padStart(2,"0");
-  return `${numero} - ${m.nome}${teclado}`;
-}
-
-function montarLinhaHTML(m, index){
-  const teclado = m.tipo === "Com teclado" ? " [TECLADO]" : "";
-  const numero = m.numero || String(index + 1).padStart(2,"0");
-
-  if(m.numero){
-    return `<span class="numero-lilas">${numero}</span> - ${escapeHTML(m.nome)}${teclado}`;
-  }
-
-  return `${numero} - ${escapeHTML(m.nome)}${teclado}`;
-}
-
-function escapeHTML(texto){
-  return String(texto)
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
-}
-
 function gerarRepertorio(){
-  const local = document.getElementById("local").value;
-  const data = document.getElementById("data").value;
-
-  const selecionadas = ordemEscolha
-    .map(id => todas.find(m => m.id === id))
-    .filter(Boolean);
-
-  if(selecionadas.length === 0){
-    alert("Escolha pelo menos uma música.");
-    return;
-  }
-
-  let textoPDF = `CICRANOS ROCK\n`;
-  textoPDF += `Local: ${local || "Não informado"}\n`;
-  textoPDF += `Data: ${data || "Não informada"}\n\n`;
-  textoPDF += `REPERTÓRIO\n\n`;
-
-  let html = `CICRANOS ROCK\n`;
-  html += `Local: ${escapeHTML(local || "Não informado")}\n`;
-  html += `Data: ${escapeHTML(data || "Não informada")}\n\n`;
-  html += `REPERTÓRIO\n\n`;
-
-  selecionadas.forEach((m, index) => {
-    textoPDF += `${montarLinha(m, index)}\n`;
-    html += `${montarLinhaHTML(m, index)}\n`;
-  });
-
-  ultimoTextoPDF = textoPDF;
-  document.getElementById("resultado").innerHTML = html;
-
-  localStorage.setItem("ultimoRepertorioHTML", html);
-  localStorage.setItem("ultimoRepertorioPDF", textoPDF);
-  salvarEstadoSelecao();
+ const local=document.getElementById("local").value;
+ const data=document.getElementById("data").value;
+ const inputs=[...document.querySelectorAll("#listaMusicas input")];
+ const escolhidas=ordemEscolha.map(id=>inputs.find(i=>i.value===id && i.checked)).filter(Boolean);
+ if(escolhidas.length===0){alert("Escolha pelo menos uma música.");return;}
+ let texto=`CICRANOS ROCK\n`;
+ texto+=`Local: ${local || "Não informado"}\n`;
+ texto+=`Data: ${data || "Não informada"}\n\n`;
+ texto+=`REPERTÓRIO\n\n`;
+ escolhidas.forEach((item,index)=>{
+  const seq=String(index+1).padStart(2,"0");
+  const leo=String(item.dataset.leo || "--").padStart(2,"0");
+  const teclado=item.dataset.tipo==="Com teclado" ? " [TECLADO]" : "";
+  texto+=`${seq} | ${leo} | ${item.dataset.nome}${teclado}\n`;
+ });
+ document.getElementById("resultado").innerText=texto;
+ localStorage.setItem("ultimoRepertorio",texto);
 }
-
 function salvarPDF(){
-  const resultado = ultimoTextoPDF || localStorage.getItem("ultimoRepertorioPDF") || "";
-
-  if(!resultado.trim()){
-    alert("Gere um repertório antes de salvar.");
-    return;
-  }
-
-  if(!window.jspdf){
-    const script = document.createElement("script");
-    script.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
-    script.onload = () => criarPDF(resultado);
-    script.onerror = () => alert("Não foi possível carregar o gerador de PDF. Verifique a internet e tente novamente.");
-    document.body.appendChild(script);
-    return;
-  }
-
-  criarPDF(resultado);
+ const resultado=document.getElementById("resultado").innerText;
+ if(!resultado.trim()){alert("Gere um repertório antes de salvar.");return;}
+ const { jsPDF }=window.jspdf;
+ const doc=new jsPDF();
+ const linhas=doc.splitTextToSize(resultado,180);
+ doc.setFont("helvetica","normal");doc.setFontSize(11);doc.text(linhas,15,20);
+ const local=document.getElementById("local").value||"Show";
+ const data=document.getElementById("data").value||"SemData";
+ const nomeArquivo=`Cicranos_${local.replace(/[^a-z0-9]/gi,"_")}_${data}.pdf`;
+ doc.save(nomeArquivo);
 }
-
-function criarPDF(resultado){
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-  const linhas = doc.splitTextToSize(resultado, 180);
-
-  doc.setFont("helvetica","normal");
-  doc.setFontSize(11);
-  doc.text(linhas, 15, 20);
-
-  const local = document.getElementById("local").value || "Show";
-  const data = document.getElementById("data").value || "SemData";
-  const nomeArquivo = `Cicranos_${local.replace(/[^a-z0-9]/gi,"_")}_${data}.pdf`;
-
-  doc.save(nomeArquivo);
-}
-
 function limparSelecao(){
-  document.querySelectorAll("#listaMusicas input").forEach(i => i.checked = false);
-  ordemEscolha = [];
-  ultimoTextoPDF = "";
-  document.getElementById("resultado").innerText = "";
-  localStorage.removeItem("ultimoRepertorioHTML");
-  localStorage.removeItem("ultimoRepertorioPDF");
-  localStorage.removeItem("ordemEscolha");
+ document.querySelectorAll("#listaMusicas input").forEach(i=>i.checked=false);
+ ordemEscolha=[];
+ document.getElementById("resultado").innerText="";
+ localStorage.removeItem("ultimoRepertorio");
+ localStorage.removeItem("ordemEscolha");
 }
-
-function restaurarEstado(){
-  ordemEscolha = JSON.parse(localStorage.getItem("ordemEscolha") || "[]");
-
-  document.querySelectorAll("#listaMusicas input").forEach(input => {
-    if(ordemEscolha.includes(input.dataset.id)){
-      input.checked = true;
-    }
-  });
-
-  const htmlSalvo = localStorage.getItem("ultimoRepertorioHTML") || "";
-  const pdfSalvo = localStorage.getItem("ultimoRepertorioPDF") || "";
-
-  ultimoTextoPDF = pdfSalvo;
-  document.getElementById("resultado").innerHTML = htmlSalvo;
-}
-
-window.addEventListener("DOMContentLoaded", function(){
-  carregarListas();
-  restaurarEstado();
-});
+carregarListas();
+registrarOrdemEscolha();
+document.getElementById("resultado").innerText=localStorage.getItem("ultimoRepertorio")||"";
 </script>
-
 </body>
 </html>
